@@ -17,7 +17,13 @@ poetry run uvicorn src.main:app --reload
 cp .env.example .env
 docker compose up --build
 ```
+
 Swagger docs: http://127.0.0.1:8000/docs
+
+## Database migrations
+```bash
+docker compose exec web alembic upgrade head
+```
 
 ## Run tests
 ```bash
