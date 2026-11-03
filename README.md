@@ -157,3 +157,22 @@ All genres with the number of movies in each. Use a genre `id` as `genre_id` in 
 ```bash
 docker compose exec web python -m src.scripts.seed_movies
 ```
+
+## API: Favorites, likes and comments
+
+Endpoints marked 🔒 require `Authorization: Bearer <access_token>`.
+
+### Favorites
+- 🔒 `POST /api/v1/movies/{movie_id}/favorite/` adds a movie to favorites (`201`, `409` if already added, `404` unknown movie).
+- 🔒 `DELETE /api/v1/movies/{movie_id}/favorite/` removes it (`404` if it is not in favorites).
+- 🔒 `GET /api/v1/favorites/` lists favorite movies. Supports the same query parameters as `GET /api/v1/movies/` (pagination, filters, search, sorting).
+
+### Likes and dislikes
+- 🔒 `PUT /api/v1/movies/{movie_id}/reaction/` with `{"reaction": "like"}` or `{"reaction": "dislike"}`. One reaction per user and movie: a new value replaces the old one. Returns `{"likes": N, "dislikes": N}`.
+- 🔒 `DELETE /api/v1/movies/{movie_id}/reaction/` removes your reaction.
+- `GET /api/v1/movies/{movie_id}/reactions/` public counters.
+
+### Comments
+- 🔒 `POST /api/v1/movies/{movie_id}/comments/` with `{"text": "..."}` (1-1000 characters).
+- `GET /api/v1/movies/{movie_id}/comments/` public, newest first, supports `page` and `per_page`.
+- 🔒 `DELETE /api/v1/comments/{comment_id}/` the author can delete their own comment; moderators and admins can delete any (`403` otherwise).

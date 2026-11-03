@@ -13,6 +13,10 @@ from sqlalchemy import select
 from src.models import UserGroup, UserGroupEnum, User
 from src.security import create_access_token, hash_password
 
+from decimal import Decimal
+from src.models import Certification, Movie
+
+
 @pytest.fixture
 def session_factory():
     engine = create_engine(
@@ -99,3 +103,30 @@ def auth_headers():
         return {"Authorization": f"Bearer {create_access_token(user.id)}"}
 
     return _headers
+
+@pytest.fixture
+def create_movie(db_session):
+    def _create(name="Inception", year=2010, time=148, imdb=8.8, votes=1000, price="9.99"):
+        certification = db_session.scalar(
+            select(Certification).where(Certification.name == "PG-13")
+        )
+        if certification is None:
+            certification = Certification(name="PG-13")
+            db_session.add(certification)
+            db_session.flush()
+
+        movie = Movie(
+            name=name,
+            year=year,
+            time=time,
+            imdb=imdb,
+            votes=votes,
+            description=f"Description of {name}",
+            price=Decimal(price),
+            certification_id=certification.id,
+        )
+        db_session.add(movie)
+        db_session.commit()
+        return movie
+
+    return _create
