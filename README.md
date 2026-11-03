@@ -29,3 +29,16 @@ docker compose exec web alembic upgrade head
 ```bash
 poetry run pytest
 ```
+
+## API: Accounts
+
+### POST /api/v1/accounts/register/
+Registers a new user. The account is inactive until activated.
+
+Request body:
+```json
+{"email": "user@example.com", "password": "Test1234!"}
+```
+Password rules: min 8 chars, uppercase, lowercase, digit, special character.
+
+Responses: `201` created, `409` email already exists, `422` validation error.
