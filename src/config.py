@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     postgres_host: str = "localhost"
     postgres_port: int = 5432
 
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    email_from: str = "no-reply@online-cinema.local"
+
     model_config = SettingsConfigDict(env_file=".env")
 
     @property
