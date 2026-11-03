@@ -121,3 +121,11 @@ Admin-only endpoints:
 - `POST /api/v1/admin/users/{user_id}/activate/` activates an account manually.
 
 Responses: `401` not authorized, `403` not an admin, `404` user not found.
+
+## Movies data model
+Tables: `movies`, `genres`, `stars`, `directors`, `certifications`
+and association tables `movie_genres`, `movie_stars`, `movie_directors`.
+
+- A movie has exactly one certification and many genres, stars and directors.
+- `(name, year, time)` is unique for movies; names of genres, stars,
+  directors and certifications are unique.
