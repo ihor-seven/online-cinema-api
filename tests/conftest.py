@@ -41,3 +41,13 @@ def client(session_factory):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def sent_emails(monkeypatch):
+    sent = []
+    monkeypatch.setattr(
+        "src.routes.accounts.send_activation_email",
+        lambda email, token: sent.append((email, token)),
+    )
+    return sent

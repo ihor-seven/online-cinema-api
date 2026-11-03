@@ -19,3 +19,15 @@ class UserRegisterResponse(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+class ActivationRequest(BaseModel):
+    email: EmailStr
+    token: str
+
+
+class ResendActivationRequest(BaseModel):
+    email: EmailStr
+
+
+class MessageResponse(BaseModel):
+    message: str
