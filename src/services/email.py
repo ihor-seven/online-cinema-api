@@ -27,4 +27,18 @@ def send_activation_email(email: str, token: str) -> None:
             "The token is valid for 24 hours."
         ),
     )
-    
+
+
+def send_password_reset_email(email: str, token: str) -> None:
+    send_email(
+        to=email,
+        subject="Reset your Online Cinema password",
+        body=(
+            "We received a request to reset your password.\n\n"
+            "Send this token together with your email and a new password "
+            "to POST /api/v1/accounts/reset-password/ :\n\n"
+            f"{token}\n\n"
+            "The token is valid for 1 hour. "
+            "If you did not request this, just ignore this email."
+        ),
+    )
