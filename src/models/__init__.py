@@ -16,6 +16,8 @@ from src.models.movies import (
     movie_genres,
     movie_stars,
 )
+from src.models.interactions import Comment, FavoriteMovie, MovieReaction
+
 
 __all__ = [
     "ActivationToken",
@@ -32,4 +34,7 @@ __all__ = [
     "movie_directors",
     "movie_genres",
     "movie_stars",
+    "Comment",
+    "FavoriteMovie",
+    "MovieReaction"
 ]
