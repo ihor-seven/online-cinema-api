@@ -1,18 +1,21 @@
-import secrets
-from datetime import datetime, timedelta, timezone
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.database import get_db
-from src.models import ActivationToken, User, UserGroup, UserGroupEnum
-from src.schemas.accounts import UserRegisterRequest, UserRegisterResponse
+from src.models import User, UserGroup, UserGroupEnum
+from src.schemas.accounts import (
+    ActivationRequest,
+    MessageResponse,
+    ResendActivationRequest,
+    UserRegisterRequest,
+    UserRegisterResponse,
+)
 from src.security import hash_password
+from src.services.email import send_activation_email
+from src.services.tokens import build_activation_token, is_expired
 
 router = APIRouter(prefix="/api/v1/accounts", tags=["Accounts"])
-
-ACTIVATION_TOKEN_TTL_HOURS = 24
 
 
 @router.post(
@@ -21,8 +24,8 @@ ACTIVATION_TOKEN_TTL_HOURS = 24
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user",
     description=(
-        "Creates a new inactive account in the USER group and generates "
-        "an activation token valid for 24 hours. "
+        "Creates a new inactive account in the USER group, generates an "
+        "activation token valid for 24 hours and sends it to the user's email. "
         "The password must contain at least 8 characters, an uppercase "
         "letter, a lowercase letter, a digit and a special character."
     ),
@@ -31,11 +34,14 @@ ACTIVATION_TOKEN_TTL_HOURS = 24
         422: {"description": "Invalid email or weak password"},
     },
 )
-def register_user(data: UserRegisterRequest, db: Session = Depends(get_db)):
+def register_user(
+    data: UserRegisterRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     email = data.email.lower()
 
-    existing_user = db.scalar(select(User).where(User.email == email))
-    if existing_user:
+    if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"A user with email {email} already exists.",
@@ -55,14 +61,85 @@ def register_user(data: UserRegisterRequest, db: Session = Depends(get_db)):
     db.add(user)
     db.flush()
 
-    activation_token = ActivationToken(
-        user_id=user.id,
-        token=secrets.token_urlsafe(32),
-        expires_at=datetime.now(timezone.utc)
-        + timedelta(hours=ACTIVATION_TOKEN_TTL_HOURS),
-    )
+    activation_token = build_activation_token(user.id)
     db.add(activation_token)
     db.commit()
     db.refresh(user)
 
+    background_tasks.add_task(send_activation_email, email, activation_token.token)
+
     return user
+
+
+@router.post(
+    "/activate/",
+    response_model=MessageResponse,
+    summary="Activate an account",
+    description=(
+        "Activates the account using the token received by email. "
+        "The token is valid for 24 hours and is deleted after use."
+    ),
+    responses={
+        400: {
+            "description": "Invalid or expired token, or the account is "
+            "already active"
+        },
+    },
+)
+def activate_account(data: ActivationRequest, db: Session = Depends(get_db)):
+    email = data.email.lower()
+    user = db.scalar(select(User).where(User.email == email))
+
+    if user is not None and user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account is already active.",
+        )
+
+    token = user.activation_token if user else None
+    if token is None or token.token != data.token or is_expired(token.expires_at):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired activation token.",
+        )
+
+    user.is_active = True
+    db.delete(token)
+    db.commit()
+
+    return MessageResponse(message="User account activated successfully.")
+
+
+@router.post(
+    "/resend-activation/",
+    response_model=MessageResponse,
+    summary="Resend the activation token",
+    description=(
+        "Generates a new activation token (valid for another 24 hours) and "
+        "sends it to the email. The response is always the same, so it does "
+        "not reveal whether the email is registered."
+    ),
+)
+def resend_activation(
+    data: ResendActivationRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    email = data.email.lower()
+    user = db.scalar(select(User).where(User.email == email))
+
+    if user is not None and not user.is_active:
+        if user.activation_token is not None:
+            db.delete(user.activation_token)
+            db.flush()
+
+        new_token = build_activation_token(user.id)
+        db.add(new_token)
+        db.commit()
+
+        background_tasks.add_task(send_activation_email, email, new_token.token)
+
+    return MessageResponse(
+        message="If your account exists and is not activated, "
+        "a new activation token has been sent."
+    )
