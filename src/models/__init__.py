@@ -6,12 +6,30 @@ from src.models.accounts import (
     UserGroup,
     UserGroupEnum,
 )
+from src.models.movies import (
+    Certification,
+    Director,
+    Genre,
+    Movie,
+    Star,
+    movie_directors,
+    movie_genres,
+    movie_stars,
+)
 
 __all__ = [
     "ActivationToken",
+    "Certification",
+    "Director",
+    "Genre",
+    "Movie",
     "PasswordResetToken",
     "RefreshToken",
+    "Star",
     "User",
     "UserGroup",
     "UserGroupEnum",
+    "movie_directors",
+    "movie_genres",
+    "movie_stars",
 ]
