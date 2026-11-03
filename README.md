@@ -85,3 +85,39 @@ Revokes the refresh token (deletes it from the database).
 
 ### GET /api/v1/accounts/me/
 Returns the current user. Send header `Authorization: Bearer <access_token>`.
+
+## API: Passwords
+
+### POST /api/v1/accounts/change-password/
+Requires `Authorization: Bearer <access_token>`. Changes the password; all refresh tokens are revoked.
+```json
+{"old_password": "Test1234!", "new_password": "NewPass5678?"}
+```
+Responses: `200`, `400` wrong old password, `422` weak new password.
+
+### POST /api/v1/accounts/forgot-password/
+Sends a reset token (valid for 1 hour) to an active account's email. Always returns `200`.
+```json
+{"email": "user@example.com"}
+```
+
+### POST /api/v1/accounts/reset-password/
+Sets a new password using the reset token, without the old password.
+```json
+{"email": "user@example.com", "token": "<token from email>", "new_password": "NewPass5678?"}
+```
+Responses: `200`, `400` invalid/expired token, `422` weak password.
+
+## User groups and admin API
+Groups: `USER` (basic access), `MODERATOR` (will manage movies), `ADMIN` (all rights).
+
+Create the first admin:
+```bash
+docker compose exec web python -m src.scripts.create_admin admin@example.com 'Admin1234!'
+```
+
+Admin-only endpoints:
+- `PATCH /api/v1/admin/users/{user_id}/group/` with `{"group": "MODERATOR"}` changes the user's group.
+- `POST /api/v1/admin/users/{user_id}/activate/` activates an account manually.
+
+Responses: `401` not authorized, `403` not an admin, `404` user not found.
