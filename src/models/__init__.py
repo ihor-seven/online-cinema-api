@@ -1,5 +1,6 @@
 from src.models.accounts import (
     ActivationToken,
+    PasswordResetToken,
     RefreshToken,
     User,
     UserGroup,
@@ -8,6 +9,7 @@ from src.models.accounts import (
 
 __all__ = [
     "ActivationToken",
+    "PasswordResetToken",
     "RefreshToken",
     "User",
     "UserGroup",
