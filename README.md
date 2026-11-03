@@ -42,3 +42,20 @@ Request body:
 Password rules: min 8 chars, uppercase, lowercase, digit, special character.
 
 Responses: `201` created, `409` email already exists, `422` validation error.
+
+### POST /api/v1/accounts/activate/
+Activates an account with the token sent by email (valid for 24 hours).
+```json
+{"email": "user@example.com", "token": "<token from email>"}
+```
+Responses: `200` activated, `400` invalid/expired token or already active.
+
+### POST /api/v1/accounts/resend-activation/
+Sends a new activation token (valid for another 24 hours).
+```json
+{"email": "user@example.com"}
+```
+Always returns `200` so it does not reveal whether the email is registered.
+
+### Emails in development
+Emails are caught by Mailpit: http://localhost:8025
