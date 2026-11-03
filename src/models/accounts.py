@@ -40,3 +40,20 @@ class User(Base):
     group_id: Mapped[int] = mapped_column(ForeignKey("user_groups.id"), nullable=False)
 
     group: Mapped["UserGroup"] = relationship(back_populates="users")
+    activation_token: Mapped["ActivationToken | None"] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+
+class ActivationToken(Base):
+    __tablename__ = "activation_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    token: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+
+    user: Mapped["User"] = relationship(back_populates="activation_token")
