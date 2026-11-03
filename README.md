@@ -129,3 +129,31 @@ and association tables `movie_genres`, `movie_stars`, `movie_directors`.
 - A movie has exactly one certification and many genres, stars and directors.
 - `(name, year, time)` is unique for movies; names of genres, stars,
   directors and certifications are unique.
+
+## API: Movie catalog (public)
+
+### GET /api/v1/movies/
+Returns a page of movies. All query parameters are optional and can be combined:
+
+| Parameter | Description |
+|---|---|
+| `page`, `per_page` | Pagination (default 1 and 10, max `per_page` is 20) |
+| `year`, `min_year`, `max_year` | Filter by release year |
+| `min_imdb`, `max_imdb` | Filter by IMDb rating (0-10) |
+| `genre_id` | Only movies of this genre |
+| `search` | Search in title, description, stars and directors |
+| `sort_by` | `price`, `year`, `imdb`, `votes` (popularity), `name` (default `year`) |
+| `order` | `asc` or `desc` (default `desc`) |
+
+Response: `items`, `page`, `per_page`, `total_items`, `total_pages`.
+
+### GET /api/v1/movies/{movie_id}/
+Full movie details. `404` if the movie does not exist.
+
+### GET /api/v1/genres/
+All genres with the number of movies in each. Use a genre `id` as `genre_id` in the movie list to see its movies.
+
+### Sample data
+```bash
+docker compose exec web python -m src.scripts.seed_movies
+```
