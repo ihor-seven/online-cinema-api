@@ -48,9 +48,7 @@ def login(client):
     return client.post(LOGIN, json={"email": EMAIL, "password": PASSWORD})
 
 
-def test_login_success_returns_tokens_and_stores_refresh(
-    client, db_session, make_user
-):
+def test_login_success_returns_tokens_and_stores_refresh(client, db_session, make_user):
     make_user()
 
     response = login(client)

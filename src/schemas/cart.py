@@ -23,4 +23,3 @@ class CartResponse(BaseModel):
     items: list[CartItemSchema]
     total_items: int
     total_price: Decimal
-    

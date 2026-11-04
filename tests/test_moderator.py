@@ -237,7 +237,9 @@ def test_update_to_existing_name_year_time_returns_409(client, moderator_headers
 def test_update_with_invalid_body_returns_422(client, moderator_headers, body):
     movie = create_via_api(client, moderator_headers)
 
-    response = client.patch(movie_url(movie["id"]), json=body, headers=moderator_headers)
+    response = client.patch(
+        movie_url(movie["id"]), json=body, headers=moderator_headers
+    )
 
     assert response.status_code == 422
 
@@ -250,7 +252,9 @@ def test_update_unknown_movie_returns_404(client, moderator_headers):
     assert response.status_code == 404
 
 
-def test_regular_user_cannot_update_movie(client, create_user, create_movie, auth_headers):
+def test_regular_user_cannot_update_movie(
+    client, create_user, create_movie, auth_headers
+):
     movie = create_movie()
     user = create_user()
 
@@ -279,7 +283,9 @@ def test_delete_unknown_movie_returns_404(client, moderator_headers):
     assert response.status_code == 404
 
 
-def test_regular_user_cannot_delete_movie(client, create_user, create_movie, auth_headers):
+def test_regular_user_cannot_delete_movie(
+    client, create_user, create_movie, auth_headers
+):
     movie = create_movie()
     user = create_user()
 
@@ -356,10 +362,14 @@ def test_delete_removes_comments_favorites_and_reactions(
     user = create_user()
     headers = auth_headers(user)
     movie = create_movie()
-    client.post(f"/api/v1/movies/{movie.id}/comments/", json={"text": "Hi"}, headers=headers)
+    client.post(
+        f"/api/v1/movies/{movie.id}/comments/", json={"text": "Hi"}, headers=headers
+    )
     client.post(f"/api/v1/movies/{movie.id}/favorite/", headers=headers)
     client.put(
-        f"/api/v1/movies/{movie.id}/reaction/", json={"reaction": "like"}, headers=headers
+        f"/api/v1/movies/{movie.id}/reaction/",
+        json={"reaction": "like"},
+        headers=headers,
     )
 
     client.delete(movie_url(movie.id), headers=moderator_headers)
@@ -378,7 +388,9 @@ NAMED = [("genres", Genre), ("stars", Star), ("directors", Director)]
 @pytest.mark.parametrize(("path", "model"), NAMED)
 def test_create_named_item(client, db_session, moderator_headers, path, model):
     response = client.post(
-        f"/api/v1/moderator/{path}/", json={"name": " Drama "}, headers=moderator_headers
+        f"/api/v1/moderator/{path}/",
+        json={"name": " Drama "},
+        headers=moderator_headers,
     )
 
     assert response.status_code == 201
@@ -387,7 +399,9 @@ def test_create_named_item(client, db_session, moderator_headers, path, model):
 
 
 @pytest.mark.parametrize(("path", "model"), NAMED)
-def test_create_duplicate_named_item_returns_409(client, moderator_headers, path, model):
+def test_create_duplicate_named_item_returns_409(
+    client, moderator_headers, path, model
+):
     url = f"/api/v1/moderator/{path}/"
     client.post(url, json={"name": "Drama"}, headers=moderator_headers)
 
@@ -397,7 +411,9 @@ def test_create_duplicate_named_item_returns_409(client, moderator_headers, path
 
 
 @pytest.mark.parametrize(("path", "model"), NAMED)
-def test_create_named_item_with_empty_name_returns_422(client, moderator_headers, path, model):
+def test_create_named_item_with_empty_name_returns_422(
+    client, moderator_headers, path, model
+):
     response = client.post(
         f"/api/v1/moderator/{path}/", json={"name": "  "}, headers=moderator_headers
     )
@@ -476,7 +492,9 @@ def test_cannot_delete_named_item_linked_to_movie(
 
 @pytest.mark.parametrize(("path", "model"), NAMED)
 def test_delete_unknown_named_item_returns_404(client, moderator_headers, path, model):
-    response = client.delete(f"/api/v1/moderator/{path}/9999/", headers=moderator_headers)
+    response = client.delete(
+        f"/api/v1/moderator/{path}/9999/", headers=moderator_headers
+    )
 
     assert response.status_code == 404
 
@@ -492,4 +510,3 @@ def test_regular_user_cannot_manage_named_items(
     )
 
     assert response.status_code == 403
-    

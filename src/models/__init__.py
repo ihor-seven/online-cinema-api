@@ -20,7 +20,6 @@ from src.models.interactions import Comment, FavoriteMovie, MovieReaction
 from src.models.cart import Cart, CartItem
 from src.models.orders import Order, OrderItem, OrderStatusEnum
 
-
 __all__ = [
     "ActivationToken",
     "Certification",
@@ -43,5 +42,5 @@ __all__ = [
     "CartItem",
     "Order",
     "OrderItem",
-    "OrderStatusEnum"
+    "OrderStatusEnum",
 ]

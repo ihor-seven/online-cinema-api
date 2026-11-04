@@ -64,4 +64,3 @@ def test_register_weak_password_returns_422(client, password):
 
 def test_validate_password_strength_accepts_strong_password():
     assert validate_password_strength("Test1234!") == "Test1234!"
-    

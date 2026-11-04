@@ -109,4 +109,3 @@ def test_movie_requires_certification(db_session):
 
     with pytest.raises(IntegrityError):
         db_session.commit()
-        

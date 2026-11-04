@@ -53,4 +53,3 @@ class MovieUpdateRequest(BaseModel):
             if field not in NULLABLE_FIELDS and getattr(self, field) is None:
                 raise ValueError(f"Field '{field}' cannot be null")
         return self
-    

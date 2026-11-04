@@ -31,9 +31,7 @@ AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
     ),
     responses={
         **AUTH_401,
-        400: {
-            "description": "The cart is empty, or none of its movies can be ordered"
-        },
+        400: {"description": "The cart is empty, or none of its movies can be ordered"},
     },
 )
 def create_order(
@@ -151,7 +149,9 @@ def list_purchased_movies(
             Order.status == OrderStatusEnum.PAID,
         )
     )
-    return get_movies_page(db, select(Movie).where(Movie.id.in_(purchased_ids)), filters)
+    return get_movies_page(
+        db, select(Movie).where(Movie.id.in_(purchased_ids)), filters
+    )
 
 
 def _get_own_order_or_404(db: Session, order_id: int, user_id: int) -> Order:

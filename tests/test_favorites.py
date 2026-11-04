@@ -20,7 +20,9 @@ def test_add_to_favorites(client, create_user, create_movie, auth_headers):
     assert names(listed) == ["Inception"]
 
 
-def test_add_same_movie_twice_returns_409(client, create_user, create_movie, auth_headers):
+def test_add_same_movie_twice_returns_409(
+    client, create_user, create_movie, auth_headers
+):
     user = create_user()
     movie = create_movie()
     client.post(fav_url(movie.id), headers=auth_headers(user))
@@ -92,16 +94,19 @@ def test_favorites_support_search_filter_sort_and_pagination(
         client.post(fav_url(movie.id), headers=auth_headers(user))
     headers = auth_headers(user)
 
-    assert names(client.get(FAVORITES, params={"search": "beta"}, headers=headers)) == ["Beta"]
+    assert names(client.get(FAVORITES, params={"search": "beta"}, headers=headers)) == [
+        "Beta"
+    ]
     assert names(client.get(FAVORITES, params={"min_imdb": 8}, headers=headers)) == [
         "Gamma",
         "Beta",
     ]
     assert names(
-        client.get(FAVORITES, params={"sort_by": "price", "order": "asc"}, headers=headers)
+        client.get(
+            FAVORITES, params={"sort_by": "price", "order": "asc"}, headers=headers
+        )
     ) == ["Alpha", "Beta", "Gamma"]
 
     page = client.get(FAVORITES, params={"per_page": 2}, headers=headers).json()
     assert page["total_items"] == 3
     assert page["total_pages"] == 2
-    

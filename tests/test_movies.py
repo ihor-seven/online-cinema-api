@@ -22,22 +22,43 @@ def catalog(db_session):
     travolta = Star(name="John Travolta")
 
     inception = Movie(
-        name="Inception", year=2010, time=148, imdb=8.8, votes=2_400_000,
+        name="Inception",
+        year=2010,
+        time=148,
+        imdb=8.8,
+        votes=2_400_000,
         description="A thief who steals secrets through dreams.",
-        price=Decimal("9.99"), certification=pg13,
-        genres=[scifi, action], directors=[nolan], stars=[leo],
+        price=Decimal("9.99"),
+        certification=pg13,
+        genres=[scifi, action],
+        directors=[nolan],
+        stars=[leo],
     )
     pulp = Movie(
-        name="Pulp Fiction", year=1994, time=154, imdb=8.9, votes=2_100_000,
+        name="Pulp Fiction",
+        year=1994,
+        time=154,
+        imdb=8.9,
+        votes=2_100_000,
         description="Intertwined stories of crime in Los Angeles.",
-        price=Decimal("7.50"), certification=r_rated,
-        genres=[drama], directors=[tarantino], stars=[travolta],
+        price=Decimal("7.50"),
+        certification=r_rated,
+        genres=[drama],
+        directors=[tarantino],
+        stars=[travolta],
     )
     dark = Movie(
-        name="The Dark Knight", year=2008, time=152, imdb=9.0, votes=2_700_000,
+        name="The Dark Knight",
+        year=2008,
+        time=152,
+        imdb=9.0,
+        votes=2_700_000,
         description="Batman faces the Joker.",
-        price=Decimal("12.00"), certification=pg13,
-        genres=[action, drama], directors=[nolan], stars=[],
+        price=Decimal("12.00"),
+        certification=pg13,
+        genres=[action, drama],
+        directors=[nolan],
+        stars=[],
     )
     db_session.add_all([inception, pulp, dark, western])
     db_session.commit()
@@ -83,7 +104,13 @@ def test_page_beyond_last_returns_empty_list(client, catalog):
 
 @pytest.mark.parametrize(
     "params",
-    [{"page": 0}, {"per_page": 0}, {"per_page": 21}, {"sort_by": "color"}, {"min_imdb": 11}],
+    [
+        {"page": 0},
+        {"per_page": 0},
+        {"per_page": 21},
+        {"sort_by": "color"},
+        {"min_imdb": 11},
+    ],
 )
 def test_invalid_query_params_return_422(client, catalog, params):
     response = client.get(MOVIES_URL, params=params)
@@ -181,4 +208,3 @@ def test_genres_list_has_movie_counts(client, catalog):
     assert response.status_code == 200
     counts = {genre["name"]: genre["movie_count"] for genre in response.json()}
     assert counts == {"Action": 2, "Drama": 2, "Sci-Fi": 1, "Western": 0}
-    

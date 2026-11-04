@@ -10,7 +10,6 @@ from src.services.cart import get_cart_view, get_or_create_cart
 
 from src.services.orders import get_movie_ids_by_status
 
-
 router = APIRouter(prefix="/api/v1/cart", tags=["Cart"])
 
 AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}

@@ -151,7 +151,9 @@ def set_reaction(
     is_like = data.reaction == ReactionEnum.LIKE
     reaction = db.get(MovieReaction, (current_user.id, movie_id))
     if reaction is None:
-        db.add(MovieReaction(user_id=current_user.id, movie_id=movie_id, is_like=is_like))
+        db.add(
+            MovieReaction(user_id=current_user.id, movie_id=movie_id, is_like=is_like)
+        )
     else:
         reaction.is_like = is_like
     db.commit()
@@ -258,7 +260,9 @@ def list_comments(
 
     total_items = (
         db.scalar(
-            select(func.count()).select_from(Comment).where(Comment.movie_id == movie_id)
+            select(func.count())
+            .select_from(Comment)
+            .where(Comment.movie_id == movie_id)
         )
         or 0
     )
