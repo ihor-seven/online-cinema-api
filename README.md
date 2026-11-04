@@ -199,3 +199,33 @@ All endpoints require `Authorization: Bearer <access_token>`.
 - Admin only: `GET /api/v1/admin/orders/` lists orders of all users. Query: `user_id`, `status`, `date_from`, `date_to` (YYYY-MM-DD), `page`, `per_page`.
 
 Adding an already purchased movie to the cart returns `409`.
+
+## API: Moderator tools
+
+Require `Authorization: Bearer <access_token>` of a user from the `MODERATOR` or `ADMIN` group (`403` for regular users).
+
+### Movies
+- `POST /api/v1/moderator/movies/` creates a movie. Certification, genres, stars and directors are given by name; missing ones are created automatically. `(name, year, time)` must be unique (`409`).
+- `PATCH /api/v1/moderator/movies/{movie_id}/` partial update: send only the fields to change. Lists (`genres`, `stars`, `directors`) replace the current ones. `meta_score` and `gross` can be `null`.
+- `DELETE /api/v1/moderator/movies/{movie_id}/`:
+  - `409` if the movie is part of any order;
+  - `409` with `carts_count` if the movie is in user carts: repeat with `?force=true` to delete it and remove it from the carts;
+  - likes, favorites and comments of the movie are deleted with it.
+
+Example body for creating a movie:
+```json
+{
+  "name": "Dune", "year": 2021, "time": 155, "imdb": 8.0, "votes": 600000,
+  "description": "A noble family becomes embroiled in a war for a desert planet.",
+  "price": "11.50", "certification": "PG-13",
+  "genres": ["Sci-Fi"], "stars": ["Timothée Chalamet"], "directors": ["Denis Villeneuve"]
+}
+```
+
+### Genres, stars, directors
+For each of `genres`, `stars`, `directors`:
+- `POST /api/v1/moderator/{genres|stars|directors}/` with `{"name": "..."}`
+- `PATCH /api/v1/moderator/{genres|stars|directors}/{id}/` renames
+- `DELETE /api/v1/moderator/{genres|stars|directors}/{id}/` (`409` if linked to movies)
+
+Payments are intentionally not part of this project.
