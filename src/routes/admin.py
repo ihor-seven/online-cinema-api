@@ -7,6 +7,9 @@ from src.dependencies import require_groups
 from src.models import User, UserGroup, UserGroupEnum
 from src.schemas.accounts import ChangeGroupRequest, UserAdminResponse
 
+from src.schemas.cart import CartResponse
+from src.services.cart import get_cart_view
+
 router = APIRouter(
     prefix="/api/v1/admin",
     tags=["Admin"],
@@ -85,3 +88,19 @@ def activate_user(user_id: int, db: Session = Depends(get_db)):
     db.refresh(user)
 
     return _to_response(user)
+
+
+@router.get(
+    "/users/{user_id}/cart/",
+    response_model=CartResponse,
+    summary="View the cart of a user",
+    description="Returns the cart of any user for analysis or troubleshooting. Admin only.",
+    responses={
+        401: {"description": "Missing or invalid access token"},
+        403: {"description": "Only admins can do this"},
+        404: {"description": "User not found"},
+    },
+)
+def view_user_cart(user_id: int, db: Session = Depends(get_db)):
+    user = _get_user_or_404(db, user_id)
+    return get_cart_view(db, user.id)

@@ -176,3 +176,13 @@ Endpoints marked 🔒 require `Authorization: Bearer <access_token>`.
 - 🔒 `POST /api/v1/movies/{movie_id}/comments/` with `{"text": "..."}` (1-1000 characters).
 - `GET /api/v1/movies/{movie_id}/comments/` public, newest first, supports `page` and `per_page`.
 - 🔒 `DELETE /api/v1/comments/{comment_id}/` the author can delete their own comment; moderators and admins can delete any (`403` otherwise).
+
+## API: Shopping cart
+
+All cart endpoints require `Authorization: Bearer <access_token>`. Each user has one cart; the same movie cannot be added twice.
+
+- `GET /api/v1/cart/` shows movies (title, price, genres, year), `total_items` and `total_price`.
+- `POST /api/v1/cart/items/` with `{"movie_id": 1}` adds a movie (`201`, `404` unknown movie, `409` already in the cart).
+- `DELETE /api/v1/cart/items/{movie_id}/` removes one movie (`404` if it is not in the cart).
+- `DELETE /api/v1/cart/` clears the cart.
+- Admin only: `GET /api/v1/admin/users/{user_id}/cart/` shows the cart of any user.
