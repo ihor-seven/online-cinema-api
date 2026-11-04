@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
 
+    redis_url: str = "redis://localhost:6379/0"
+    token_cleanup_interval_seconds: int = 3600
+
     model_config = SettingsConfigDict(env_file=".env")
 
     @property
