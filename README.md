@@ -229,3 +229,14 @@ For each of `genres`, `stars`, `directors`:
 - `DELETE /api/v1/moderator/{genres|stars|directors}/{id}/` (`409` if linked to movies)
 
 Payments are intentionally not part of this project.
+
+## Background tasks (Celery)
+
+Docker Compose runs three extra services: `redis` (message broker), `celery_worker` (executes tasks) and `celery_beat` (scheduler).
+
+Task `src.tasks.delete_expired_tokens` runs every hour (`TOKEN_CLEANUP_INTERVAL_SECONDS`, default 3600) and deletes expired activation tokens, password reset tokens and refresh tokens. A user whose activation token expired can request a new one via `POST /api/v1/accounts/resend-activation/`.
+
+Check the worker:
+```bash
+docker compose logs -f celery_worker
+```
