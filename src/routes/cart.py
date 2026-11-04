@@ -4,9 +4,12 @@ from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.dependencies import get_current_user
-from src.models import Cart, CartItem, Movie, User
+from src.models import Cart, CartItem, Movie, User, OrderStatusEnum
 from src.schemas.cart import CartAddRequest, CartResponse
 from src.services.cart import get_cart_view, get_or_create_cart
+
+from src.services.orders import get_movie_ids_by_status
+
 
 router = APIRouter(prefix="/api/v1/cart", tags=["Cart"])
 
@@ -38,7 +41,7 @@ def view_cart(
     responses={
         **AUTH_401,
         404: {"description": "Movie not found"},
-        409: {"description": "The movie is already in the cart"},
+        409: {"description": "The movie is already in the cart or already purchased"},
     },
 )
 def add_to_cart(
@@ -51,6 +54,11 @@ def add_to_cart(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Movie with the given ID was not found.",
+        )
+    if movie.id in get_movie_ids_by_status(db, current_user.id, OrderStatusEnum.PAID):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You have already purchased this movie. Repeat purchases are not allowed.",
         )
 
     cart = get_or_create_cart(db, current_user.id)

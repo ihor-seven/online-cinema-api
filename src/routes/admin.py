@@ -1,14 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.dependencies import require_groups
-from src.models import User, UserGroup, UserGroupEnum
+from src.models import User, UserGroup, UserGroupEnum, Order, OrderStatusEnum
 from src.schemas.accounts import ChangeGroupRequest, UserAdminResponse
 
 from src.schemas.cart import CartResponse
 from src.services.cart import get_cart_view
+from datetime import date, datetime, time, timedelta, timezone
+
+from src.schemas.orders import OrderListResponse
+from src.services.orders import get_orders_page
+
+
 
 router = APIRouter(
     prefix="/api/v1/admin",
@@ -104,3 +110,42 @@ def activate_user(user_id: int, db: Session = Depends(get_db)):
 def view_user_cart(user_id: int, db: Session = Depends(get_db)):
     user = _get_user_or_404(db, user_id)
     return get_cart_view(db, user.id)
+
+@router.get(
+    "/orders/",
+    response_model=OrderListResponse,
+    summary="List orders of all users",
+    description=(
+        "Returns orders of all users, newest first. Filters (all optional, "
+        "can be combined): `user_id`, `status`, `date_from` and `date_to` "
+        "(inclusive, format YYYY-MM-DD). Admin only."
+    ),
+    responses={
+        401: {"description": "Missing or invalid access token"},
+        403: {"description": "Only admins can do this"},
+        422: {"description": "Invalid query parameters"},
+    },
+)
+def list_all_orders(
+    page: int = Query(1, ge=1, description="Page number, starting from 1"),
+    per_page: int = Query(10, ge=1, le=50, description="Items per page (max 50)"),
+    user_id: int | None = Query(None, description="Only orders of this user"),
+    order_status: OrderStatusEnum | None = Query(
+        None, alias="status", description="Only orders with this status"
+    ),
+    date_from: date | None = Query(None, description="Created on or after this date"),
+    date_to: date | None = Query(None, description="Created on or before this date"),
+    db: Session = Depends(get_db),
+):
+    stmt = select(Order)
+    if user_id is not None:
+        stmt = stmt.where(Order.user_id == user_id)
+    if order_status is not None:
+        stmt = stmt.where(Order.status == order_status)
+    if date_from is not None:
+        start = datetime.combine(date_from, time.min, tzinfo=timezone.utc)
+        stmt = stmt.where(Order.created_at >= start)
+    if date_to is not None:
+        end = datetime.combine(date_to + timedelta(days=1), time.min, tzinfo=timezone.utc)
+        stmt = stmt.where(Order.created_at < end)
+    return get_orders_page(db, stmt, page, per_page)

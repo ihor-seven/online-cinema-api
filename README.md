@@ -186,3 +186,16 @@ All cart endpoints require `Authorization: Bearer <access_token>`. Each user has
 - `DELETE /api/v1/cart/items/{movie_id}/` removes one movie (`404` if it is not in the cart).
 - `DELETE /api/v1/cart/` clears the cart.
 - Admin only: `GET /api/v1/admin/users/{user_id}/cart/` shows the cart of any user.
+
+## API: Orders
+
+All endpoints require `Authorization: Bearer <access_token>`.
+
+- `POST /api/v1/orders/` creates a `pending` order from the cart. Movies that are already purchased or are in another pending order are skipped and listed in `excluded` (`already_purchased` / `pending_order`). Prices are saved in `price_at_order`. `400` if the cart is empty or nothing can be ordered.
+- `GET /api/v1/orders/` lists my orders (newest first). Query: `page`, `per_page`, `status` (`pending`, `paid`, `canceled`).
+- `GET /api/v1/orders/{order_id}/` shows one of my orders (`404` for other users' orders).
+- `POST /api/v1/orders/{order_id}/cancel/` cancels a pending order. Paid orders can only be returned via a refund (`400`).
+- `GET /api/v1/purchased/` lists movies from paid orders (same filters, search and sorting as `GET /api/v1/movies/`).
+- Admin only: `GET /api/v1/admin/orders/` lists orders of all users. Query: `user_id`, `status`, `date_from`, `date_to` (YYYY-MM-DD), `page`, `per_page`.
+
+Adding an already purchased movie to the cart returns `409`.

@@ -18,6 +18,7 @@ from src.models.movies import (
 )
 from src.models.interactions import Comment, FavoriteMovie, MovieReaction
 from src.models.cart import Cart, CartItem
+from src.models.orders import Order, OrderItem, OrderStatusEnum
 
 
 __all__ = [
@@ -39,5 +40,8 @@ __all__ = [
     "FavoriteMovie",
     "MovieReaction",
     "Cart",
-    "CartItem"
+    "CartItem",
+    "Order",
+    "OrderItem",
+    "OrderStatusEnum"
 ]
