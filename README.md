@@ -2,6 +2,20 @@
 
 Online cinema REST API built with FastAPI: JWT auth, movie catalog, cart, orders and Stripe payments.
 
+![CI](https://github.com/ihor-seven/online-cinema-api/actions/workflows/ci.yml/badge.svg)
+
+## Code quality and CI
+
+GitHub Actions runs on every push to `main` and every Pull Request: `black --check`, `flake8`, `mypy` and `pytest` with a coverage report.
+
+Run the same checks locally:
+```bash
+poetry run black --check .
+poetry run flake8 src tests
+poetry run mypy src
+poetry run pytest --cov --cov-report=term-missing
+```
+
 ## Tech stack
 FastAPI, SQLAlchemy, Alembic, PostgreSQL, Redis, Celery, Docker, Poetry, Pytest
 
