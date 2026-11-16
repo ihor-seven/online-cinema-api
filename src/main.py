@@ -10,8 +10,15 @@ from src.routes.interactions import router as interactions_router
 from src.routes.cart import router as cart_router
 from src.routes.orders import router as orders_router
 from src.routes.moderator import router as moderator_router
+from src.routes.docs import router as docs_router
 
-app = FastAPI(title=settings.app_name, debug=settings.debug)
+app = FastAPI(
+    title=settings.app_name,
+    debug=settings.debug,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 
 
 app.include_router(accounts_router)
@@ -23,6 +30,7 @@ app.include_router(interactions_router)
 app.include_router(cart_router)
 app.include_router(orders_router)
 app.include_router(moderator_router)
+app.include_router(docs_router)
 
 
 @app.get("/health", tags=["Health"], summary="Check that the API is running")

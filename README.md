@@ -85,6 +85,18 @@ Response: `{"access_token": "...", "refresh_token": "...", "token_type": "bearer
 Access token lives 15 minutes, refresh token 7 days.
 Responses: `200`, `401` wrong credentials, `403` account not activated.
 
+## API documentation (protected)
+
+Swagger UI: http://127.0.0.1:8000/docs, ReDoc: http://127.0.0.1:8000/redoc, OpenAPI schema: http://127.0.0.1:8000/openapi.json
+
+The documentation is visible only to authorized users: the browser asks for an **email and password** (HTTP Basic) of any active account, for example the admin created with:
+```bash
+docker compose exec web python -m src.scripts.create_admin admin@example.com 'Admin1234!'
+```
+To call protected endpoints from Swagger, log in via `POST /api/v1/accounts/login/` and press **Authorize** with the `access_token`.
+
+Passwords must have 8-72 bytes, an uppercase and a lowercase letter, a digit and a special character.
+
 ### POST /api/v1/accounts/refresh/
 Returns a new access token for a valid refresh token.
 ```json
