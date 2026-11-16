@@ -15,13 +15,18 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+    try:
+        return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+    except ValueError:  # e.g. password longer than 72 bytes
+        return False
 
 
 def validate_password_strength(password: str) -> str:
     """Raise ValueError if the password is not complex enough."""
     if len(password) < 8:
         raise ValueError("Password must contain at least 8 characters")
+    if len(password.encode()) > 72:
+        raise ValueError("Password must be at most 72 bytes long")
     if not re.search(r"[A-Z]", password):
         raise ValueError("Password must contain at least one uppercase letter")
     if not re.search(r"[a-z]", password):
@@ -30,6 +35,7 @@ def validate_password_strength(password: str) -> str:
         raise ValueError("Password must contain at least one digit")
     if not re.search(r"[^\w\s]", password):
         raise ValueError("Password must contain at least one special character")
+
     return password
 
 
