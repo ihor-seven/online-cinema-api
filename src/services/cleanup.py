@@ -1,5 +1,9 @@
 from datetime import datetime, timezone
 
+from typing import Any, cast
+
+from sqlalchemy.engine import CursorResult
+
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
@@ -18,7 +22,10 @@ def cleanup_expired_tokens(db: Session, now: datetime | None = None) -> dict[str
     deleted: dict[str, int] = {}
 
     for table_name, model in EXPIRING_MODELS:
-        result = db.execute(delete(model).where(model.expires_at < now))
+        result = cast(
+            "CursorResult[Any]",
+            db.execute(delete(model).where(model.expires_at < now)),
+        )
         deleted[table_name] = result.rowcount
 
     db.commit()

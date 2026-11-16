@@ -4,8 +4,9 @@ from sqlalchemy import select
 
 from src.database import SessionLocal
 from src.models import Certification, Director, Genre, Movie, Star
+from typing import Any
 
-MOVIES = [
+MOVIES: list[dict[str, Any]] = [
     {
         "name": "Inception",
         "year": 2010,

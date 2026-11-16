@@ -1,5 +1,5 @@
 import math
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
@@ -29,8 +29,10 @@ from src.services.movies import get_movies_page
 
 router = APIRouter(prefix="/api/v1", tags=["Movie interactions"])
 
-AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
-MOVIE_404 = {404: {"description": "Movie not found"}}
+AUTH_401: dict[int | str, dict[str, Any]] = {
+    401: {"description": "Missing, invalid or expired access token"}
+}
+MOVIE_404: dict[int | str, dict[str, Any]] = {404: {"description": "Movie not found"}}
 
 
 def _get_movie_or_404(db: Session, movie_id: int) -> Movie:

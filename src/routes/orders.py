@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
@@ -22,7 +22,9 @@ from src.services.orders import (
 
 router = APIRouter(prefix="/api/v1", tags=["Orders"])
 
-AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
+AUTH_401: dict[int | str, dict[str, Any]] = {
+    401: {"description": "Missing, invalid or expired access token"}
+}
 
 
 @router.post(
