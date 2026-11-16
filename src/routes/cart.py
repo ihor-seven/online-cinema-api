@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
+from typing import Any
 
 from src.database import get_db
 from src.dependencies import get_current_user
@@ -10,10 +11,11 @@ from src.services.cart import get_cart_view, get_or_create_cart
 
 from src.services.orders import get_movie_ids_by_status
 
-
 router = APIRouter(prefix="/api/v1/cart", tags=["Cart"])
 
-AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
+AUTH_401: dict[int | str, dict[str, Any]] = {
+    401: {"description": "Missing, invalid or expired access token"}
+}
 
 
 @router.get(
@@ -27,7 +29,8 @@ AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
     responses=AUTH_401,
 )
 def view_cart(
-    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     return get_cart_view(db, current_user.id)
 
@@ -83,7 +86,10 @@ def add_to_cart(
     response_model=CartResponse,
     summary="Remove a movie from the cart",
     description="Removes one movie from the cart and returns the updated cart.",
-    responses={**AUTH_401, 404: {"description": "The movie is not in the cart"}},
+    responses={
+        **AUTH_401,
+        404: {"description": "The movie is not in the cart"},
+    },
 )
 def remove_from_cart(
     movie_id: int,
@@ -114,7 +120,8 @@ def remove_from_cart(
     responses=AUTH_401,
 )
 def clear_cart(
-    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     cart = db.scalar(select(Cart).where(Cart.user_id == current_user.id))
     if cart is not None:

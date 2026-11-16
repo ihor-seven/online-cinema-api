@@ -46,7 +46,9 @@ def test_regular_user_cannot_change_group(client, create_user, auth_headers):
     target = create_user(email="target@example.com")
 
     response = client.patch(
-        group_url(target.id), json={"group": "ADMIN"}, headers=auth_headers(user)
+        group_url(target.id),
+        json={"group": "ADMIN"},
+        headers=auth_headers(user),
     )
 
     assert response.status_code == 403
@@ -62,7 +64,9 @@ def test_change_group_unknown_user_returns_404(client, create_user, auth_headers
     admin = create_user(email="admin@example.com", group=UserGroupEnum.ADMIN)
 
     response = client.patch(
-        group_url(9999), json={"group": "MODERATOR"}, headers=auth_headers(admin)
+        group_url(9999),
+        json={"group": "MODERATOR"},
+        headers=auth_headers(admin),
     )
 
     assert response.status_code == 404
@@ -73,7 +77,9 @@ def test_change_group_invalid_group_returns_422(client, create_user, auth_header
     target = create_user(email="target@example.com")
 
     response = client.patch(
-        group_url(target.id), json={"group": "KING"}, headers=auth_headers(admin)
+        group_url(target.id),
+        json={"group": "KING"},
+        headers=auth_headers(admin),
     )
 
     assert response.status_code == 422

@@ -104,9 +104,17 @@ def auth_headers():
 
     return _headers
 
+
 @pytest.fixture
 def create_movie(db_session):
-    def _create(name="Inception", year=2010, time=148, imdb=8.8, votes=1000, price="9.99"):
+    def _create(
+        name="Inception",
+        year=2010,
+        time=148,
+        imdb=8.8,
+        votes=1000,
+        price="9.99",
+    ):
         certification = db_session.scalar(
             select(Certification).where(Certification.name == "PG-13")
         )

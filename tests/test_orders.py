@@ -200,7 +200,9 @@ def test_list_filter_by_status_and_pagination(
 def test_list_with_invalid_status_returns_422(client, create_user, auth_headers):
     user = create_user()
 
-    response = client.get(ORDERS, params={"status": "weird"}, headers=auth_headers(user))
+    response = client.get(
+        ORDERS, params={"status": "weird"}, headers=auth_headers(user)
+    )
 
     assert response.status_code == 422
 
@@ -328,7 +330,11 @@ def test_admin_sees_orders_of_all_users(client, auth_headers, admin_setup):
 def test_admin_filters_orders_by_user_and_status(client, auth_headers, admin_setup):
     headers = auth_headers(admin_setup["admin"])
 
-    by_user = client.get(ADMIN_ORDERS, params={"user_id": admin_setup["first"].id}, headers=headers)
+    by_user = client.get(
+        ADMIN_ORDERS,
+        params={"user_id": admin_setup["first"].id},
+        headers=headers,
+    )
     by_status = client.get(ADMIN_ORDERS, params={"status": "pending"}, headers=headers)
 
     assert [o["id"] for o in by_user.json()["items"]] == [admin_setup["paid"].id]
@@ -341,9 +347,13 @@ def test_admin_filters_orders_by_date(client, auth_headers, admin_setup):
     tomorrow = today + timedelta(days=1)
 
     today_only = client.get(
-        ADMIN_ORDERS, params={"date_from": str(today), "date_to": str(today)}, headers=headers
+        ADMIN_ORDERS,
+        params={"date_from": str(today), "date_to": str(today)},
+        headers=headers,
     )
-    future = client.get(ADMIN_ORDERS, params={"date_from": str(tomorrow)}, headers=headers)
+    future = client.get(
+        ADMIN_ORDERS, params={"date_from": str(tomorrow)}, headers=headers
+    )
 
     assert today_only.json()["total_items"] == 2
     assert future.json()["total_items"] == 0
@@ -353,4 +363,3 @@ def test_regular_user_cannot_use_admin_orders(client, auth_headers, admin_setup)
     response = client.get(ADMIN_ORDERS, headers=auth_headers(admin_setup["first"]))
 
     assert response.status_code == 403
-    

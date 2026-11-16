@@ -24,8 +24,16 @@ def test_expired_activation_tokens_are_deleted_and_valid_ones_kept(
     valid_user = create_user(email="valid@example.com", is_active=False)
     db_session.add_all(
         [
-            ActivationToken(user_id=expired_user.id, token="expired", expires_at=hours_from_now(-1)),
-            ActivationToken(user_id=valid_user.id, token="valid", expires_at=hours_from_now(1)),
+            ActivationToken(
+                user_id=expired_user.id,
+                token="expired",
+                expires_at=hours_from_now(-1),
+            ),
+            ActivationToken(
+                user_id=valid_user.id,
+                token="valid",
+                expires_at=hours_from_now(1),
+            ),
         ]
     )
     db_session.commit()
@@ -41,10 +49,26 @@ def test_expired_password_reset_and_refresh_tokens_are_deleted(db_session, creat
     other = create_user(email="other@example.com")
     db_session.add_all(
         [
-            PasswordResetToken(user_id=user.id, token="old-reset", expires_at=hours_from_now(-1)),
-            PasswordResetToken(user_id=other.id, token="new-reset", expires_at=hours_from_now(1)),
-            RefreshToken(user_id=user.id, token="old-refresh", expires_at=hours_from_now(-24)),
-            RefreshToken(user_id=user.id, token="new-refresh", expires_at=hours_from_now(24)),
+            PasswordResetToken(
+                user_id=user.id,
+                token="old-reset",
+                expires_at=hours_from_now(-1),
+            ),
+            PasswordResetToken(
+                user_id=other.id,
+                token="new-reset",
+                expires_at=hours_from_now(1),
+            ),
+            RefreshToken(
+                user_id=user.id,
+                token="old-refresh",
+                expires_at=hours_from_now(-24),
+            ),
+            RefreshToken(
+                user_id=user.id,
+                token="new-refresh",
+                expires_at=hours_from_now(24),
+            ),
         ]
     )
     db_session.commit()
@@ -91,7 +115,8 @@ def test_user_can_get_new_activation_token_after_cleanup(
     cleanup_expired_tokens(db_session)
 
     response = client.post(
-        "/api/v1/accounts/resend-activation/", json={"email": "user@example.com"}
+        "/api/v1/accounts/resend-activation/",
+        json={"email": "user@example.com"},
     )
 
     assert response.status_code == 200
@@ -121,4 +146,3 @@ def test_task_is_registered_and_scheduled_in_celery_beat():
     schedule = celery_app.conf.beat_schedule["delete-expired-tokens"]
     assert schedule["task"] == "src.tasks.delete_expired_tokens"
     assert schedule["schedule"] > 0
-    

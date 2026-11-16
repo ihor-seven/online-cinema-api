@@ -51,7 +51,9 @@ def _create_token(
 
 def create_access_token(user_id: int) -> str:
     token, _ = _create_token(
-        user_id, "access", timedelta(minutes=settings.access_token_expire_minutes)
+        user_id,
+        "access",
+        timedelta(minutes=settings.access_token_expire_minutes),
     )
     return token
 

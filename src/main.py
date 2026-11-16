@@ -11,7 +11,6 @@ from src.routes.cart import router as cart_router
 from src.routes.orders import router as orders_router
 from src.routes.moderator import router as moderator_router
 
-
 app = FastAPI(title=settings.app_name, debug=settings.debug)
 
 

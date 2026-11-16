@@ -53,16 +53,22 @@ def create_order_from_cart(db: Session, user_id: int) -> tuple[Order, list[dict]
         movie = cart_item.movie
         if movie.id in purchased:
             excluded.append(
-                {"movie_id": movie.id, "name": movie.name, "reason": "already_purchased"}
+                {
+                    "movie_id": movie.id,
+                    "name": movie.name,
+                    "reason": "already_purchased",
+                }
             )
         elif movie.id in pending:
             excluded.append(
-                {"movie_id": movie.id, "name": movie.name, "reason": "pending_order"}
+                {
+                    "movie_id": movie.id,
+                    "name": movie.name,
+                    "reason": "pending_order",
+                }
             )
         else:
-            order.items.append(
-                OrderItem(movie_id=movie.id, price_at_order=movie.price)
-            )
+            order.items.append(OrderItem(movie_id=movie.id, price_at_order=movie.price))
 
     if not order.items:
         raise OrderError("None of the movies in your cart can be ordered.", excluded)

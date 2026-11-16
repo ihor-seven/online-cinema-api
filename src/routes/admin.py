@@ -14,8 +14,6 @@ from datetime import date, datetime, time, timedelta, timezone
 from src.schemas.orders import OrderListResponse
 from src.services.orders import get_orders_page
 
-
-
 router = APIRouter(
     prefix="/api/v1/admin",
     tags=["Admin"],
@@ -111,6 +109,7 @@ def view_user_cart(user_id: int, db: Session = Depends(get_db)):
     user = _get_user_or_404(db, user_id)
     return get_cart_view(db, user.id)
 
+
 @router.get(
     "/orders/",
     response_model=OrderListResponse,
@@ -146,6 +145,8 @@ def list_all_orders(
         start = datetime.combine(date_from, time.min, tzinfo=timezone.utc)
         stmt = stmt.where(Order.created_at >= start)
     if date_to is not None:
-        end = datetime.combine(date_to + timedelta(days=1), time.min, tzinfo=timezone.utc)
+        end = datetime.combine(
+            date_to + timedelta(days=1), time.min, tzinfo=timezone.utc
+        )
         stmt = stmt.where(Order.created_at < end)
     return get_orders_page(db, stmt, page, per_page)

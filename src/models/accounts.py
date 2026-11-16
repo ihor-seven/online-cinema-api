@@ -50,6 +50,7 @@ class User(Base):
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
 
+
 class ActivationToken(Base):
     __tablename__ = "activation_tokens"
 
@@ -64,6 +65,7 @@ class ActivationToken(Base):
 
     user: Mapped["User"] = relationship(back_populates="activation_token")
 
+
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
@@ -77,6 +79,7 @@ class RefreshToken(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="refresh_tokens")
+
 
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"

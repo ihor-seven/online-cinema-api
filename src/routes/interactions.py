@@ -1,5 +1,5 @@
 import math
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
@@ -29,8 +29,10 @@ from src.services.movies import get_movies_page
 
 router = APIRouter(prefix="/api/v1", tags=["Movie interactions"])
 
-AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
-MOVIE_404 = {404: {"description": "Movie not found"}}
+AUTH_401: dict[int | str, dict[str, Any]] = {
+    401: {"description": "Missing, invalid or expired access token"}
+}
+MOVIE_404: dict[int | str, dict[str, Any]] = {404: {"description": "Movie not found"}}
 
 
 def _get_movie_or_404(db: Session, movie_id: int) -> Movie:
@@ -138,7 +140,11 @@ def list_favorites(
         "A user has at most one reaction per movie: sending a different "
         "value changes it. Returns the updated counters."
     ),
-    responses={**AUTH_401, **MOVIE_404, 422: {"description": "Invalid reaction"}},
+    responses={
+        **AUTH_401,
+        **MOVIE_404,
+        422: {"description": "Invalid reaction"},
+    },
 )
 def set_reaction(
     movie_id: int,
@@ -151,7 +157,9 @@ def set_reaction(
     is_like = data.reaction == ReactionEnum.LIKE
     reaction = db.get(MovieReaction, (current_user.id, movie_id))
     if reaction is None:
-        db.add(MovieReaction(user_id=current_user.id, movie_id=movie_id, is_like=is_like))
+        db.add(
+            MovieReaction(user_id=current_user.id, movie_id=movie_id, is_like=is_like)
+        )
     else:
         reaction.is_like = is_like
     db.commit()
@@ -224,7 +232,11 @@ def _reaction_counts(db: Session, movie_id: int) -> ReactionCountsResponse:
     status_code=status.HTTP_201_CREATED,
     summary="Write a comment",
     description="Adds a comment (1-1000 characters) to the movie.",
-    responses={**AUTH_401, **MOVIE_404, 422: {"description": "Invalid comment text"}},
+    responses={
+        **AUTH_401,
+        **MOVIE_404,
+        422: {"description": "Invalid comment text"},
+    },
 )
 def create_comment(
     movie_id: int,
@@ -258,7 +270,9 @@ def list_comments(
 
     total_items = (
         db.scalar(
-            select(func.count()).select_from(Comment).where(Comment.movie_id == movie_id)
+            select(func.count())
+            .select_from(Comment)
+            .where(Comment.movie_id == movie_id)
         )
         or 0
     )

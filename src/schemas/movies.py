@@ -1,5 +1,5 @@
 import enum
-import uuid
+import uuid as uuid_lib
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -45,7 +45,7 @@ class NamedItemSchema(BaseModel):
 
 class MovieListItemSchema(BaseModel):
     id: int
-    uuid: uuid.UUID
+    uuid: uuid_lib.UUID
     name: str
     year: int
     time: int
@@ -78,4 +78,3 @@ class GenreWithCountSchema(BaseModel):
     id: int
     name: str
     movie_count: int
-    

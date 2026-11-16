@@ -21,6 +21,7 @@ class UserRegisterResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class ActivationRequest(BaseModel):
     email: EmailStr
     token: str

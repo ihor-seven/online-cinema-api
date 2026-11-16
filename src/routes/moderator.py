@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
+from typing import Any
 
 from src.database import get_db
 from src.dependencies import require_groups
@@ -38,7 +39,7 @@ router = APIRouter(
     ],
 )
 
-ACCESS_ERRORS = {
+ACCESS_ERRORS: dict[int | str, dict[str, Any]] = {
     401: {"description": "Missing or invalid access token"},
     403: {"description": "Only moderators and admins can do this"},
 }
@@ -91,6 +92,10 @@ def create_movie(data: MovieCreateRequest, db: Session = Depends(get_db)):
         )
 
     certification = get_or_create_by_name(db, Certification, data.certification)
+    genres = resolve_names(db, Genre, data.genres)
+    stars = resolve_names(db, Star, data.stars)
+    directors = resolve_names(db, Director, data.directors)
+
     movie = Movie(
         name=data.name,
         year=data.year,
@@ -102,10 +107,10 @@ def create_movie(data: MovieCreateRequest, db: Session = Depends(get_db)):
         description=data.description,
         price=data.price,
         certification_id=certification.id,
+        genres=genres,
+        stars=stars,
+        directors=directors,
     )
-    movie.genres = resolve_names(db, Genre, data.genres)
-    movie.stars = resolve_names(db, Star, data.stars)
-    movie.directors = resolve_names(db, Director, data.directors)
 
     db.add(movie)
     db.commit()

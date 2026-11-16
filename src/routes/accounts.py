@@ -97,7 +97,12 @@ def activate_account(data: ActivationRequest, db: Session = Depends(get_db)):
         )
 
     token = user.activation_token if user else None
-    if token is None or token.token != data.token or is_expired(token.expires_at):
+    if (
+        user is None
+        or token is None
+        or token.token != data.token
+        or is_expired(token.expires_at)
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired activation token.",

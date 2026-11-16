@@ -20,6 +20,8 @@ def create_admin(email: str, password: str) -> None:
         admin_group = db.scalar(
             select(UserGroup).where(UserGroup.name == UserGroupEnum.ADMIN)
         )
+        assert admin_group is not None
+
         user = db.scalar(select(User).where(User.email == email.lower()))
         if user is None:
             user = User(

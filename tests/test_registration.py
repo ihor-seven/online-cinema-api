@@ -54,7 +54,13 @@ def test_register_invalid_email_returns_422(client):
 
 @pytest.mark.parametrize(
     "password",
-    ["short1!", "alllowercase1!", "ALLUPPERCASE1!", "NoDigitsHere!", "NoSpecial123"],
+    [
+        "short1!",
+        "alllowercase1!",
+        "ALLUPPERCASE1!",
+        "NoDigitsHere!",
+        "NoSpecial123",
+    ],
 )
 def test_register_weak_password_returns_422(client, password):
     response = client.post(URL, json={**VALID, "password": password})
@@ -64,4 +70,3 @@ def test_register_weak_password_returns_422(client, password):
 
 def test_validate_password_strength_accepts_strong_password():
     assert validate_password_strength("Test1234!") == "Test1234!"
-    

@@ -100,9 +100,7 @@ def test_forgot_password_sends_email_for_active_user(
     assert sent_reset_emails == [(EMAIL, get_reset_token(db_session).token)]
 
 
-def test_forgot_password_unknown_email_returns_same_response(
-    client, sent_reset_emails
-):
+def test_forgot_password_unknown_email_returns_same_response(client, sent_reset_emails):
     response = client.post(FORGOT, json={"email": "no@example.com"})
 
     assert response.status_code == 200
@@ -190,8 +188,8 @@ def test_reset_password_token_cannot_be_reused(client, db_session, create_user):
     client.post(RESET, json={"email": EMAIL, "token": token, "new_password": NEW})
 
     response = client.post(
-        RESET, json={"email": EMAIL, "token": token, "new_password": "Other1234!x"}
+        RESET,
+        json={"email": EMAIL, "token": token, "new_password": "Other1234!x"},
     )
 
     assert response.status_code == 400
-    
