@@ -54,7 +54,10 @@ def test_cart_requires_authorization(client, create_movie):
     movie = create_movie()
 
     assert client.get(CART).status_code in (401, 403)
-    assert client.post(ITEMS, json={"movie_id": movie.id}).status_code in (401, 403)
+    assert client.post(ITEMS, json={"movie_id": movie.id}).status_code in (
+        401,
+        403,
+    )
     assert client.delete(CART).status_code in (401, 403)
 
 
@@ -84,7 +87,10 @@ def test_cart_shows_title_price_genres_year_and_total(
     response = client.get(CART, headers=auth_headers(user))
 
     data = response.json()
-    assert [item["name"] for item in data["items"]] == ["Inception", "Pulp Fiction"]
+    assert [item["name"] for item in data["items"]] == [
+        "Inception",
+        "Pulp Fiction",
+    ]
     inception = data["items"][0]
     assert inception["year"] == 2010
     assert float(inception["price"]) == pytest.approx(9.99)

@@ -1,4 +1,4 @@
-import uuid
+import uuid as uuid_lib
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -18,23 +18,41 @@ from src.database import Base
 movie_genres = Table(
     "movie_genres",
     Base.metadata,
-    Column("movie_id", ForeignKey("movies.id", ondelete="CASCADE"), primary_key=True),
-    Column("genre_id", ForeignKey("genres.id", ondelete="CASCADE"), primary_key=True),
+    Column(
+        "movie_id",
+        ForeignKey("movies.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "genre_id",
+        ForeignKey("genres.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 movie_directors = Table(
     "movie_directors",
     Base.metadata,
-    Column("movie_id", ForeignKey("movies.id", ondelete="CASCADE"), primary_key=True),
     Column(
-        "director_id", ForeignKey("directors.id", ondelete="CASCADE"), primary_key=True
+        "movie_id",
+        ForeignKey("movies.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "director_id",
+        ForeignKey("directors.id", ondelete="CASCADE"),
+        primary_key=True,
     ),
 )
 
 movie_stars = Table(
     "movie_stars",
     Base.metadata,
-    Column("movie_id", ForeignKey("movies.id", ondelete="CASCADE"), primary_key=True),
+    Column(
+        "movie_id",
+        ForeignKey("movies.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
     Column("star_id", ForeignKey("stars.id", ondelete="CASCADE"), primary_key=True),
 )
 
@@ -88,8 +106,8 @@ class Movie(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    uuid: Mapped[uuid.UUID] = mapped_column(
-        Uuid, default=uuid.uuid4, unique=True, nullable=False
+    uuid: Mapped[uuid_lib.UUID] = mapped_column(
+        Uuid, default=uuid_lib.uuid4, unique=True, nullable=False
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     year: Mapped[int] = mapped_column(nullable=False)

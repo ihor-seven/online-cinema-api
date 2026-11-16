@@ -62,7 +62,12 @@ def catalog(db_session):
     )
     db_session.add_all([inception, pulp, dark, western])
     db_session.commit()
-    return {"inception": inception, "pulp": pulp, "dark": dark, "action": action}
+    return {
+        "inception": inception,
+        "pulp": pulp,
+        "dark": dark,
+        "action": action,
+    }
 
 
 def names(response):

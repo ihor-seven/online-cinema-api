@@ -8,9 +8,17 @@ from src.database import get_db
 from src.dependencies import get_current_user
 from src.models import Movie, Order, OrderItem, OrderStatusEnum, User
 from src.schemas.movies import MovieFilters, MovieListResponse
-from src.schemas.orders import OrderCreateResponse, OrderListResponse, OrderSchema
+from src.schemas.orders import (
+    OrderCreateResponse,
+    OrderListResponse,
+    OrderSchema,
+)
 from src.services.movies import get_movies_page
-from src.services.orders import OrderError, create_order_from_cart, get_orders_page
+from src.services.orders import (
+    OrderError,
+    create_order_from_cart,
+    get_orders_page,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["Orders"])
 
@@ -35,7 +43,8 @@ AUTH_401 = {401: {"description": "Missing, invalid or expired access token"}}
     },
 )
 def create_order(
-    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     try:
         order, excluded = create_order_from_cart(db, current_user.id)

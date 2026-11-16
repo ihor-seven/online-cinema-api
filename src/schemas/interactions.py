@@ -21,7 +21,8 @@ class ReactionCountsResponse(BaseModel):
 
 class CommentCreateRequest(BaseModel):
     text: Annotated[
-        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)
+        str,
+        StringConstraints(strip_whitespace=True, min_length=1, max_length=1000),
     ]
 
 

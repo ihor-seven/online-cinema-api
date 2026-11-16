@@ -331,7 +331,9 @@ def test_admin_filters_orders_by_user_and_status(client, auth_headers, admin_set
     headers = auth_headers(admin_setup["admin"])
 
     by_user = client.get(
-        ADMIN_ORDERS, params={"user_id": admin_setup["first"].id}, headers=headers
+        ADMIN_ORDERS,
+        params={"user_id": admin_setup["first"].id},
+        headers=headers,
     )
     by_status = client.get(ADMIN_ORDERS, params={"status": "pending"}, headers=headers)
 

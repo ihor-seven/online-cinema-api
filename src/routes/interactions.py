@@ -138,7 +138,11 @@ def list_favorites(
         "A user has at most one reaction per movie: sending a different "
         "value changes it. Returns the updated counters."
     ),
-    responses={**AUTH_401, **MOVIE_404, 422: {"description": "Invalid reaction"}},
+    responses={
+        **AUTH_401,
+        **MOVIE_404,
+        422: {"description": "Invalid reaction"},
+    },
 )
 def set_reaction(
     movie_id: int,
@@ -226,7 +230,11 @@ def _reaction_counts(db: Session, movie_id: int) -> ReactionCountsResponse:
     status_code=status.HTTP_201_CREATED,
     summary="Write a comment",
     description="Adds a comment (1-1000 characters) to the movie.",
-    responses={**AUTH_401, **MOVIE_404, 422: {"description": "Invalid comment text"}},
+    responses={
+        **AUTH_401,
+        **MOVIE_404,
+        422: {"description": "Invalid comment text"},
+    },
 )
 def create_comment(
     movie_id: int,

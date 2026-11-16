@@ -103,7 +103,9 @@ def test_favorites_support_search_filter_sort_and_pagination(
     ]
     assert names(
         client.get(
-            FAVORITES, params={"sort_by": "price", "order": "asc"}, headers=headers
+            FAVORITES,
+            params={"sort_by": "price", "order": "asc"},
+            headers=headers,
         )
     ) == ["Alpha", "Beta", "Gamma"]
 

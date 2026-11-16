@@ -188,7 +188,8 @@ def test_reset_password_token_cannot_be_reused(client, db_session, create_user):
     client.post(RESET, json={"email": EMAIL, "token": token, "new_password": NEW})
 
     response = client.post(
-        RESET, json={"email": EMAIL, "token": token, "new_password": "Other1234!x"}
+        RESET,
+        json={"email": EMAIL, "token": token, "new_password": "Other1234!x"},
     )
 
     assert response.status_code == 400

@@ -61,7 +61,11 @@ def create_order_from_cart(db: Session, user_id: int) -> tuple[Order, list[dict]
             )
         elif movie.id in pending:
             excluded.append(
-                {"movie_id": movie.id, "name": movie.name, "reason": "pending_order"}
+                {
+                    "movie_id": movie.id,
+                    "name": movie.name,
+                    "reason": "pending_order",
+                }
             )
         else:
             order.items.append(OrderItem(movie_id=movie.id, price_at_order=movie.price))
