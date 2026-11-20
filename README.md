@@ -17,7 +17,7 @@ REST API of an online cinema built with FastAPI: registration with email activat
 
 Infrastructure: Docker Compose, Poetry, Alembic migrations, Celery + Redis + celery-beat (cleanup of expired tokens), GitHub Actions CI, protected API documentation, tests with coverage.
 
-> Online payments are intentionally not part of this project: the orders feature covers the purchase flow up to the `pending` / `canceled` states.
+> **Payments are not implemented.** The `paid` order status exists in the data model (purchased movies list, protection against buying a movie twice), but there is no payment gateway integration, so orders stay `pending` or `canceled`.
 
 ## Tech stack
 
@@ -193,21 +193,47 @@ src/
   celery_app.py, tasks.py, main.py
 alembic/        Database migrations
 tests/          Pytest test suite
-docker-compose.yml, Dockerfile, pyproject.toml
-.github/workflows/ci.yml
+docker-compose.yml, docker-compose.prod.yml, Dockerfile, pyproject.toml
+.github/workflows/ci.yml   CI (black, flake8, mypy, pytest) and deploy to EC2
+docs/images/               Screenshots for this README
 ```
+
+## Out of scope
+
+Not implemented in this project: online payments (Stripe) and refunds, user profiles with avatars (MinIO storage), movie ratings on a 10-point scale, notifications about replies and likes on comments, HTTPS on the demo server.
 
 ## Development workflow
 
 Every feature was developed in its own branch (`feature/user-registration`, `feature/jwt-auth`, `feature/shopping-cart`, ...) with small commits, tests and documentation, and merged through a Pull Request checked by CI.
 
-
 ## Deployment (AWS EC2)
 
-The app runs on an AWS EC2 instance (Ubuntu, Docker Compose, `docker-compose.prod.yml`): http://<IP>/ (API docs: http://<IP>/docs, log in with an active account).
+The app is deployed on an AWS EC2 instance (Ubuntu, Docker Compose, `docker-compose.prod.yml`). Demo: http://16.192.85.36/ (API docs: http://16.192.85.36/docs, log in with an active account). The demo server may be stopped to save costs.
 
 Every merge into `main` triggers the **deploy** job in GitHub Actions: after black, flake8, mypy and tests pass, it connects to the server over SSH, pulls the latest code, rebuilds the containers, applies Alembic migrations and checks `/health`.
 
 Required GitHub secrets: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`.
 
 Note: the demo runs over plain HTTP. For real production add a domain and HTTPS (for example Nginx + Let's Encrypt).
+
+## Screenshots
+
+**API documentation (Swagger UI)**
+
+![Swagger overview](docs/images/swagger-overview.png)
+
+**Documented endpoint with parameters and responses**
+
+![Swagger endpoint](docs/images/swagger-endpoint.png)
+
+**Tests and coverage**
+
+![Tests and coverage](docs/images/tests-coverage.png)
+
+**CI/CD in GitHub Actions**
+
+![GitHub Actions](docs/images/github-actions.png)
+
+**Running on AWS EC2**
+
+![Server containers](docs/images/server-containers.png)
