@@ -200,3 +200,14 @@ docker-compose.yml, Dockerfile, pyproject.toml
 ## Development workflow
 
 Every feature was developed in its own branch (`feature/user-registration`, `feature/jwt-auth`, `feature/shopping-cart`, ...) with small commits, tests and documentation, and merged through a Pull Request checked by CI.
+
+
+## Deployment (AWS EC2)
+
+The app runs on an AWS EC2 instance (Ubuntu, Docker Compose, `docker-compose.prod.yml`): http://<IP>/ (API docs: http://<IP>/docs, log in with an active account).
+
+Every merge into `main` triggers the **deploy** job in GitHub Actions: after black, flake8, mypy and tests pass, it connects to the server over SSH, pulls the latest code, rebuilds the containers, applies Alembic migrations and checks `/health`.
+
+Required GitHub secrets: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`.
+
+Note: the demo runs over plain HTTP. For real production add a domain and HTTPS (for example Nginx + Let's Encrypt).
