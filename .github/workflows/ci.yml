@@ -73,8 +73,10 @@ jobs:
           ssh -i ~/.ssh/deploy_key "$EC2_USER@$EC2_HOST" << 'EOF'
             set -e
             cd ~/online-cinema-api
+            install -m 600 .env ~/.cinema.env.backup
             git fetch origin main
             git reset --hard origin/main
+            install -m 600 ~/.cinema.env.backup .env
             docker compose -f docker-compose.prod.yml up --build -d
             docker compose -f docker-compose.prod.yml exec -T web alembic upgrade head
             curl -fsS --retry 10 --retry-delay 3 --retry-connrefused http://localhost/health
